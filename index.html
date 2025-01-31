@@ -16,20 +16,19 @@
         </li>
     </header>
     <div class="container">
-
         <div class="front-pic">
             <div class="front-pic-text">
                 <h1>AI Resume Screening</h1>
-            <p>
-                Our AI-powered resume screening system simplifies the hiring process by automatically reviewing and evaluating resumes. 
-                By using advanced algorithms, the system analyzes resumes for key information like skills, experience, and qualifications, 
-                comparing them to job requirements. This allows recruiters to quickly identify the most suitable candidates, 
-                streamlining the hiring process while ensuring a fair and unbiased evaluation. With this tool, you'll save time, 
-                improve efficiency, and make smarter hiring decisions.
-            </p>
-            <a href="#upload-section1" class="btn-link">
-                <button class="btn">Upload resume</button>
-            </a>
+                <p>
+                    Our AI-powered resume screening system simplifies the hiring process by automatically reviewing and evaluating resumes. 
+                    By using advanced algorithms, the system analyzes resumes for key information like skills, experience, and qualifications, 
+                    comparing them to job requirements. This allows recruiters to quickly identify the most suitable candidates, 
+                    streamlining the hiring process while ensuring a fair and unbiased evaluation. With this tool, you'll save time, 
+                    improve efficiency, and make smarter hiring decisions.
+                </p>
+                <a href="#upload-section1" class="btn-link">
+                    <button class="btn">Upload resume</button>
+                </a>
             </div>
             <img src="pic/438-30.png" alt="Resume Screening System" class="front-pic-img">
         </div>
@@ -46,35 +45,34 @@
 
         <div class="analytics-dashboard">
             <div class="metric-card">
-                <div class="metric-value" id="totalResumes">0</div>
-                <div class="metric-label">Total Resumes</div>
+                <div class="metric-value" id="key_roles"></div>
+                <div class="metric-label">Key Roles</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="avgExperience">0</div>
+                <div class="metric-value" id="avgExperience"></div>
                 <div class="metric-label">Avg. Experience (yrs)</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="matchRate">0%</div>
+                <div class="metric-value" id="matchRate"></div>
                 <div class="metric-label">Match Rate</div>
             </div>
         </div>
 
-        <div class="resume-list" id="resumeList">
+        <div class="resume-list" id="resumeList" style="margin-top: 30px;">
+            <h2>Resume List</h2>
             <!-- Resume cards will be populated here -->
         </div> 
-
     </div>
 
     <script>
         let resumes = [];
         let jobDescription = '';
-
+    
         document.getElementById('jobDescription').addEventListener('input', function(e) {
             jobDescription = e.target.value;
         });
-
-        // In handleFileUpload function, update the fetch call:
-const handleFileUpload = (file) => {
+    
+        const handleFileUpload = (file) => {
     if (!jobDescription) {
         alert('Please enter a job description first');
         return;
@@ -88,19 +86,19 @@ const handleFileUpload = (file) => {
         method: 'POST',
         body: formData,
     })
-    .then(response => {
-        if (!response.ok) throw new Error('Server error');
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
         const resumeData = {
             name: file.name,
-            category: data.category,
-            similarity: data.similarity_score,
-            keywords: data.key_roles,
-            experience: data.experience
+            experience: data.experience,
+            key_roles: data.key_roles,
+            similarity: data.similarity_score
         };
-        
+
         resumes.push(resumeData);
         updateAnalytics();
         addResumeCard(resumeData);
@@ -110,22 +108,24 @@ const handleFileUpload = (file) => {
         alert('Error processing resume: ' + error.message);
     });
 };
-
+    
         function updateAnalytics() {
-            // Update total resumes
-            document.getElementById('totalResumes').textContent = resumes.length;
-
+            // Extract unique key roles
+            const allKeyRoles = resumes.flatMap(resume => resume.keywords);
+            const uniqueKeyRoles = [...new Set(allKeyRoles)];
+            document.getElementById('key_roles').textContent = uniqueKeyRoles.length;
+    
             // Update average experience
             const totalExp = resumes.reduce((sum, r) => sum + r.experience, 0);
             document.getElementById('avgExperience').textContent = 
-                (totalExp / resumes.length).toFixed(1);
-
+                resumes.length ? (totalExp / resumes.length).toFixed(1) : "0";
+    
             // Update match rate (assuming >70% similarity is a match)
             const matches = resumes.filter(r => r.similarity >= 70).length;
             document.getElementById('matchRate').textContent = 
-                `${((matches / resumes.length) * 100).toFixed(0)}%`;
+                resumes.length ? `${((matches / resumes.length) * 100).toFixed(0)}%` : "0%";
         }
-
+    
         function addResumeCard(resume) {
             const card = document.createElement('div');
             card.className = 'resume-card';
@@ -144,17 +144,17 @@ const handleFileUpload = (file) => {
                     </div>
                 </div>
                 <div class="keywords">
-                    ${resume.keywords.map(k => `<span class="keyword">${k}</span>`).join('')}
+                    ${resume.key_roles.map(k => `<span class="keyword">${k}</span>`).join('')}
                 </div>
                 <div style="margin-top: 1rem;">
-                    Experience: ${resume.experience} years
+                    Experience: ${resume. avg_experience} years
                 </div>
             `;
-
+    
             document.getElementById('resumeList').appendChild(card);
         }
-
-        // Existing event listeners and helper functions
+    
+        // File Drop & Upload Event Handlers
         const handleFileDrop = (event) => {
             event.preventDefault();
             const files = event.dataTransfer.files;
@@ -162,16 +162,17 @@ const handleFileUpload = (file) => {
                 Array.from(files).forEach(handleFileUpload);
             }
         };
-
+    
         const handleFileSelect = (event) => {
             Array.from(event.target.files).forEach(handleFileUpload);
         };
-
+    
         const dropArea = document.querySelector('.upload-section');
         dropArea.addEventListener('dragover', (event) => event.preventDefault());
         dropArea.addEventListener('drop', handleFileDrop);
-
+    
         document.getElementById('fileInput').addEventListener('change', handleFileSelect);
     </script>
+    
 </body>
 </html>

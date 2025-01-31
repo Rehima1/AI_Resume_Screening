@@ -71,7 +71,6 @@ app.post('/upload', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
-    // Create uploads directory if not exists
     if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
         fs.mkdirSync(path.join(__dirname, 'uploads'));
     }

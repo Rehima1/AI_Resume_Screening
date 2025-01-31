@@ -61,8 +61,6 @@ def evaluate_cv(job_desc, cv_text):
 
     similarity = cosine_similarity(job_vec, cv_vec).flatten()[0]
 
-    doc = nlp(cv_text)
-    key_roles = [ent.text for ent in doc.ents if ent.label_ in ["ORG", "WORK_OF_ART"]]
     key_roles, avg_experience = extract_key_roles_and_experience(cv_text)
 
     return {
@@ -74,10 +72,6 @@ def evaluate_cv(job_desc, cv_text):
 def evaluate_cv_enhanced(job_desc, cv_path):
     cv_text = extract_text_from_pdf(cv_path)
     result = evaluate_cv(job_desc, cv_text)
-    
-    # Ensure similarity_score is scaled to percentage
-    result['similarity_score'] = round(result['similarity_score'] * 100, 2)
-    
     return result
 
 if __name__ == "__main__":
