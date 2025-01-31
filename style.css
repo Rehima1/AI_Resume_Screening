@@ -190,6 +190,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     text-align: center;
+    display: inline-block;
 }
 
 .metric-value {
@@ -216,4 +217,51 @@ body {
 
 .button:hover {
     background-color: #2980b9;
+}
+
+.resume-card {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.resume-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.category-tag {
+    margin-top: 0.5rem;
+}
+
+.similarity {
+    text-align: right;
+}
+
+.similarity-bar {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.similarity-fill {
+    background-color: #4caf50;
+    height: 10px;
+}
+
+.keywords {
+    margin-top: 1rem;
+}
+
+.keyword {
+    display: inline-block;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+    padding: 0.2rem 0.5rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
 }
