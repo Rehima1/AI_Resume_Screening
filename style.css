@@ -1,0 +1,218 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    background-color: #8b4c22;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.nav {
+    display: flex;
+    justify-content: space-around;
+    
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    list-style-type: none;
+}
+
+.nav a {
+    color: #ecf0f1;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav a:hover {
+    background-color: #7a5231;
+    color: white;
+}
+
+.front-pic {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.front-pic-text {
+    flex: 1;
+    padding: 2rem;
+}
+
+.front-pic img {
+    margin-left: auto;
+    height: 50%;
+    width: 50%;
+}
+
+.front-pic .btn:hover {
+    background-color: #89644e;
+}
+
+.front-pic h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    margin: auto;
+    margin-bottom: 30px;
+}
+    
+.front-pic p {
+    font-size: 1.2rem;
+    color: #525959;
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.btn{
+    background-color: #d1824e;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 30%;
+    transition: background-color 0.3s ease;
+}
+
+#jobDescription {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 1rem;
+    resize: none;
+  
+}
+
+.upload-section {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.drag-drop-area {
+    border: 2px dashed #42341c;
+    padding: 2rem;
+    margin: 1rem 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.drag-drop-area:hover {
+    background-color: #f0f8ff;
+    border-color: #ddd2b7;
+}
+
+.resume-list {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+}
+
+.resume-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s ease;
+}
+
+.resume-item:hover {
+    background-color: #f9f9f9;
+}
+
+.resume-info {
+    flex: 2;
+}
+
+.resume-status {
+    flex: 1;
+    text-align: right;
+}
+
+.status-chip {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.status-new {
+    background-color: #3498db;
+    color: white;
+}
+
+.status-approved {
+    background-color: #27ae60;
+    color: white;
+}
+
+.status-rejected {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.analytics-dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.metric-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 0.5rem 0;
+}
+
+.metric-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.button {
+    background-color: #3498db;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #2980b9;
+}
