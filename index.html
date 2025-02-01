@@ -69,23 +69,23 @@
 
     <script>
         let resumes = [];
-        let jobDescription = '';
+        let job_desc = '';
     
         document.getElementById('jobDescription').addEventListener('input', function(e) {
-            jobDescription = e.target.value;
+            job_desc = e.target.value;
         });
     
-        const handleFileUpload = (file) => {
-            if (!jobDescription) {
+        const handleFileUpload = (resume_file) => {
+            if (!job_desc) {
                 alert('Please enter a job description first');
                 return;
             }
 
             const formData = new FormData();
-            formData.append('resume', file);
-            formData.append('job_desc', jobDescription);  // Ensure job_desc matches the Flask key
+            formData.append('resume', resume_file);
+            formData.append('job_desc', job_desc);  // Ensure job_desc matches the Flask key
 
-            fetch('http://localhost:5000/upload', {  // Flask runs on port 5000 by default
+            fetch('http://127.0.0.1:5000', {  // Flask runs on port 5000 by default
                 method: 'POST',
                 body: formData,
             })
@@ -96,7 +96,7 @@
                 }
 
                 const resumeData = {
-                    name: file.name,
+                    name: resume_file.name,
                     experience: data.avg_experience,
                     key_roles: data.key_roles,
                     similarity_score: data.similarity_score,

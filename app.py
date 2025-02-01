@@ -9,48 +9,36 @@ import nltk
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from flask_cors import CORS
-import sys  # Add this import for sys.exit
+import sys
+from joblib import load  # Ensure this import for joblib
 
 app = Flask(__name__)
 CORS(app)
 
-# Load spaCy model
-nlp = spacy.load("en_core_web_sm")
+# Load models with absolute paths and protocol handling
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-# Load pre-trained model, vectorizer, and label encoder
-def load_pickle_file(file_path):
+def load_model_safe(file_name):
+    """Universal loader with protocol fallback"""
+    file_path = os.path.join(BASE_DIR, file_name)
     try:
-        with open(file_path, 'rb') as file:
-            return pickle.load(file)
-    except pickle.UnpicklingError as e:
-        print(f"Unpickling error loading {file_path}: {e}")
-        sys.exit(1)
+        # Try standard joblib load first
+        from joblib import load
+        return load(file_path)
     except Exception as e:
-        print(f"Error loading {file_path}: {e}")
-        sys.exit(1)
-
-# Additional logging to check file content
-def check_file_content(file_path):
-    try:
-        with open(file_path, 'rb') as file:
-            content = file.read()
-            print(f"File content of {file_path}: {content[:100]}...")  # Print first 100 bytes for inspection
-    except Exception as e:
-        print(f"Error reading {file_path}: {e}")
-
-# Check the content of the pickle files
-check_file_content('resume_screening_model.pkl')
-check_file_content('tfidf_vectorizer.pkl')
-check_file_content('label_encoder.pkl')
-
-# Attempt to load the pickle files
-try:
-    model = load_pickle_file('resume_screening_model.pkl')
-    vectorizer = load_pickle_file('tfidf_vectorizer.pkl')
-    label_encoder = load_pickle_file('label_encoder.pkl')
-except Exception as e:
-    print(f"Failed to load pickle files: {e}")
-    sys.exit(1)
+        print(f"Joblib load failed for {file_name}, attempting pickle5: {str(e)}")
+        try:
+            # Fallback to pickle5 with proper import
+            import pickle5 as pickle
+            with open(file_path, 'rb') as f:
+                return pickle.load(f)
+        except ModuleNotFoundError:
+            print("ERROR: Required package 'pickle5' not installed. Run:")
+            print("pip install pickle5")
+            sys.exit(1)
+        except Exception as pe:
+            print(f"Failed to load {file_name} with pickle5: {str(pe)}")
+            sys.exit(1)
 
 # Function to extract text from a PDF file
 def extract_text_from_pdf(pdf_path):
