@@ -37,7 +37,7 @@
         </div>
         <div class="upload-section" id="upload-section1">
             <input type="file" style="display: none;" accept=".pdf,.docx,.txt" id="fileInput">
-            <p>Drop PDF, DOCX, or TXT files here</p>
+            <p>Drop PDF files here</p>
             <p>or</p>
             <button class="btn" style="margin: auto;" onclick="document.getElementById('fileInput').click()">Upload your resume</button>
         </div>
@@ -48,15 +48,15 @@
                 <div class="metric-label">Key Roles</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="avgExperience"></div>
+                <div class="metric-value" id="avg_experience"></div>
                 <div class="metric-label">Avg. Experience (yrs)</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="matchRate"></div>
+                <div class="metric-value" id="similarity_score"></div>
                 <div class="metric-label">Match Rate</div>
             </div>
             <div class="metric-card">
-                <div class="metric-value" id="category"></div>
+                <div class="metric-value" id="job_category"></div>
                 <div class="metric-label">Category</div>
             </div>
         </div>
@@ -65,7 +65,11 @@
             <h2>Resume List</h2>
             <!-- Resume cards will be populated here -->
         </div> 
+        
     </div>
+    <footer class="footer">
+        &copy; 2025 AI resume screening system. All rights reserved.
+    </footer>
 
     <script>
         let resumes = [];
@@ -82,27 +86,29 @@
             }
 
             const formData = new FormData();
-            formData.append('resume', resume_file);
-            formData.append('job_desc', job_desc);  // Ensure job_desc matches the Flask key
+            formData.append('job_desc', job_desc);
+            formData.append('resume', resume_file); 
 
-            fetch('http://127.0.0.1:5000', {  // Flask runs on port 5000 by default
+            fetch('http://127.0.0.1:5000/upload', {  // Flask runs on port 5000 by default
                 method: 'POST',
                 body: formData,
             })
-            .then(response => response.json())  // Expect JSON response
+            .then(response => response.json())
             .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
+                console.log("Response:", data);
+                document.getElementById("key_roles").textContent = data.key_roles || "N/A";
+                document.getElementById("avg_experience").textContent = data.avg_experience || "N/A";
+                document.getElementById("similarity_score").textContent = data.similarity_score || "N/A";
+                document.getElementById("job_category").textContent = data.job_category || "N/A";
+                
                 const resumeData = {
-                    name: resume_file.name,
-                    experience: data.avg_experience,
                     key_roles: data.key_roles,
+                    experience: data.avg_experience,
                     similarity_score: data.similarity_score,
-                    category: data.job_category
+                    job_category: data.job_category,
+                    name: resume_file.name
                 };
-
+                
                 resumes.push(resumeData);
                 updateAnalytics();
                 addResumeCard(resumeData);
@@ -121,21 +127,21 @@
     
             // Update average experience
             const totalExp = resumes.reduce((sum, r) => sum + r.experience, 0);
-            document.getElementById('avgExperience').textContent = 
+            document.getElementById('avg_experience').textContent = 
                 resumes.length ? (totalExp / resumes.length).toFixed(1) : "0";
     
             // Update match rate (assuming >70% similarity is a match)
             const matches = resumes.filter(r => r.similarity_score >= 0.7).length;
-            document.getElementById('matchRate').textContent = 
+            document.getElementById('similarity_score').textContent = 
                 resumes.length ? `${((matches / resumes.length) * 100).toFixed(0)}%` : "0%";
 
             // Update category (assuming the most frequent category is displayed)
             const categoryCounts = resumes.reduce((acc, r) => {
-                acc[r.category] = (acc[r.category] || 0) + 1;
+                acc[r.job_category] = (acc[r.job_category] || 0) + 1;
                 return acc;
             }, {});
             const mostFrequentCategory = Object.keys(categoryCounts).reduce((a, b) => categoryCounts[a] > categoryCounts[b] ? a : b, '');
-            document.getElementById('category').textContent = mostFrequentCategory;
+            document.getElementById('job_category').textContent = mostFrequentCategory;
         }
     
         function addResumeCard(resume) {

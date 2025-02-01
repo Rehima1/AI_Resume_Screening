@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 from werkzeug.utils import secure_filename
 import PyPDF2
@@ -10,37 +10,43 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from flask_cors import CORS
 import sys
-from joblib import load  # Ensure this import for joblib
+import logging
+from joblib import load  
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+# Load the spaCy model
+nlp = spacy.load("en_core_web_sm")
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Ensure CORS is enabled
 
-# Load models with absolute paths and protocol handling
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 def load_model_safe(file_name):
     """Universal loader with protocol fallback"""
     file_path = os.path.join(BASE_DIR, file_name)
     try:
-        # Try standard joblib load first
         from joblib import load
         return load(file_path)
     except Exception as e:
-        print(f"Joblib load failed for {file_name}, attempting pickle5: {str(e)}")
+        print(f"Joblib load failed for {file_name}, attempting pickle: {str(e)}")
         try:
-            # Fallback to pickle5 with proper import
-            import pickle5 as pickle
             with open(file_path, 'rb') as f:
                 return pickle.load(f)
-        except ModuleNotFoundError:
-            print("ERROR: Required package 'pickle5' not installed. Run:")
-            print("pip install pickle5")
-            sys.exit(1)
         except Exception as pe:
-            print(f"Failed to load {file_name} with pickle5: {str(pe)}")
+            print(f"Failed to load {file_name} with pickle: {str(pe)}")
             sys.exit(1)
 
-# Function to extract text from a PDF file
+try:
+    model = load_model_safe('resume_screening_model.pkl')
+    vectorizer = load_model_safe('tfidf_vectorizer.pkl')
+    label_encoder = load_model_safe('label_encoder.pkl')
+except Exception as e:
+    print(f"CRITICAL ERROR: {str(e)}")
+    sys.exit(1)
+
 def extract_text_from_pdf(pdf_path):
     with open(pdf_path, 'rb') as pdf_file:
         pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -51,9 +57,9 @@ def extract_text_from_pdf(pdf_path):
 def clean_text(text):
     if text is None:
         return ''
-    text = re.sub(r'\W', ' ', text)  # Remove special characters
-    text = re.sub(r'\s+', ' ', text).strip()  # Remove extra spaces
-    text = text.lower()  # Convert to lowercase
+    text = re.sub(r'\W', ' ', text)  
+    text = re.sub(r'\s+', ' ', text).strip()
+    text = text.lower() 
     return text
 
 # Function to evaluate CV
@@ -67,12 +73,12 @@ def evaluate_cv(job_desc, cv_path):
     cv_vec = vectorizer.transform([cv_text_clean])
     similarity_score = cosine_similarity(job_desc_vec, cv_vec)[0][0]
 
-    # Extract key roles (sample logic, you can customize it)
+    # Extract key roles from CV
     doc = nlp(cv_text)
     key_roles = [ent.text for ent in doc.ents if ent.label_ in ["ORG", "WORK_OF_ART"]]
 
     # Extract experience
-    experience_pattern = r"(\d+)\+?\s?(years?|yrs?)\s?(of\s?)?(experience)?"
+    experience_pattern = r"(\d+(?:\.\d+)?)\+?\s?(years?|yrs?)\s?(of\s?)?(experience)?"
     experience_matches = re.findall(experience_pattern, cv_text, re.IGNORECASE)
     total_experience = sum(int(match[0]) for match in experience_matches) if experience_matches else 0
     avg_experience = total_experience / len(experience_matches) if experience_matches else 0
@@ -82,14 +88,18 @@ def evaluate_cv(job_desc, cv_path):
     job_category_label = label_encoder.inverse_transform(job_category)[0]
 
     return {
-        "similarity_score": similarity_score,
         "key_roles": key_roles,
         "avg_experience": avg_experience,
+        "similarity_score": similarity_score,
         "job_category": job_category_label
     }
 
+@app.route('/', methods=['GET'])
+def index():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'index.html')
+
 # Route for uploading job description and resume
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=["GET", "POST"])
 def upload_file():
     try:
         job_desc = request.form.get('job_desc')
@@ -100,8 +110,7 @@ def upload_file():
 
         # Create upload directory if it doesn't exist
         upload_dir = 'uploads'
-        if not os.path.exists(upload_dir):
-            os.makedirs(upload_dir)
+        os.makedirs(upload_dir, exist_ok=True)
 
         # Save the uploaded file
         filename = secure_filename(resume_file.filename)
@@ -118,7 +127,6 @@ def upload_file():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-# Run the Flask app
+    
 if __name__ == "__main__":
     app.run(debug=True)
