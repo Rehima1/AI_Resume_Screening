@@ -89,7 +89,7 @@
             formData.append('job_desc', job_desc);
             formData.append('resume', resume_file); 
 
-            fetch('http://127.0.0.1:5000/upload', {  // Flask runs on port 5000 by default
+            fetch('http://127.0.0.1:5000/upload', {  
                 method: 'POST',
                 body: formData,
             })
@@ -135,7 +135,6 @@
             document.getElementById('similarity_score').textContent = 
                 resumes.length ? `${((matches / resumes.length) * 100).toFixed(0)}%` : "0%";
 
-            // Update category (assuming the most frequent category is displayed)
             const categoryCounts = resumes.reduce((acc, r) => {
                 acc[r.job_category] = (acc[r.job_category] || 0) + 1;
                 return acc;
@@ -172,7 +171,6 @@
             document.getElementById('resumeList').appendChild(card);
         }
     
-        // File Drop & Upload Event Handlers
         const handleFileDrop = (event) => {
             event.preventDefault();
             const files = event.dataTransfer.files;

@@ -13,14 +13,12 @@ import sys
 import logging
 from joblib import load  
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Load the spaCy model
 nlp = spacy.load("en_core_web_sm")
 
 app = Flask(__name__)
-CORS(app)  # Ensure CORS is enabled
+CORS(app)  
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -98,7 +96,6 @@ def evaluate_cv(job_desc, cv_path):
 def index():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'index.html')
 
-# Route for uploading job description and resume
 @app.route('/upload', methods=["GET", "POST"])
 def upload_file():
     try:
@@ -108,19 +105,15 @@ def upload_file():
         if not resume_file or not job_desc:
             return jsonify({"error": "Missing file or job description"}), 400
 
-        # Create upload directory if it doesn't exist
         upload_dir = 'uploads'
         os.makedirs(upload_dir, exist_ok=True)
 
-        # Save the uploaded file
         filename = secure_filename(resume_file.filename)
         resume_path = os.path.join(upload_dir, filename)
         resume_file.save(resume_path)
 
-        # Process the resume
         result = evaluate_cv(job_desc, resume_path)
 
-        # Delete the uploaded file after processing
         os.remove(resume_path)
 
         return jsonify(result)
