@@ -49,7 +49,7 @@ The AI Resume Screening System is designed for those who are like me, looking fo
    ![Screenshot 2025-02-02 005402](https://github.com/user-attachments/assets/9c3b16d8-f321-4862-a7c4-d1f1c571fa19)
 
 5. **View Analytics:**
-   ![Screenshot 2025-02-02 005728](https://github.com/user-attachments/assets/dc384a44-1e45-4f76-9654-8d6276a4623d)
+   ![Screenshot 2025-02-02 005728](https://github.com/user-attachments/assets/dc384a44-1e45-4f7a4623d)
 
 6. **Log in/Sign up Page:**
    ![Screenshot 2025-02-02 004914](https://github.com/user-attachments/assets/440e130a-55a3-45eb-9c2e-a8eb2a410ee4)
